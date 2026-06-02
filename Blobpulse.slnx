@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="blobpulse.API/Blobpulse.API.csproj" />
+  <Project Path="blobpulse.Core/Blobpulse.Core.csproj" Id="f79e4660-6891-4da1-af02-7e6093ac3227" />
+</Solution>
