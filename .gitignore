@@ -10,3 +10,9 @@
 /Blobpulse.Core/obj
 /.vs
 /Blobpulse.API/Blobpulse.API.csproj.user
+/blobpulse-api/.vs/Blobpulse.slnx
+/blobpulse-api/Blobpulse.API/.vs
+/blobpulse-api/Blobpulse.API/bin/Debug/net10.0
+/blobpulse-api/Blobpulse.API/obj
+/blobpulse-api/Blobpulse.Core/bin/Debug/net10.0
+/blobpulse-api/Blobpulse.Core/obj

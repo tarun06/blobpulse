@@ -1,7 +1,9 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    allowedDevOrigins: ['10.169.9.181','http://localhost:3000'],
-    devIndicators: false,
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  output: "standalone",
+  poweredByHeader: false,
+  compress: true,
 };
 
 export default nextConfig;

@@ -12,6 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\blobpulse.Core\Blobpulse.Core.csproj" />
+    <ProjectReference Include="..\Blobpulse.Core\Blobpulse.Core.csproj" />
   </ItemGroup>
 </Project>
