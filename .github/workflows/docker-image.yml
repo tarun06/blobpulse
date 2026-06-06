@@ -5,10 +5,6 @@ on:
     branches:
       - main
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: blobpulse
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -21,11 +17,6 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Convert repository owner to lowercase
-        id: owner
-        run: |
-          echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
-
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -35,13 +26,17 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build \
-            -t ghcr.io/${{ steps.owner.outputs.owner }}/blobpulse:latest \
-            -t ghcr.io/${{ steps.owner.outputs.owner }}/blobpulse:${{ github.sha }} \
-            .
+          docker build . \
+            -t ghcr.io/${{ github.repository_owner }}/blobpulse:latest \
+            -t ghcr.io/${{ github.repository_owner }}/blobpulse:${{ github.sha }}
 
-      - name: Push latest tag
-        run: docker push ghcr.io/${{ steps.owner.outputs.owner }}/blobpulse:latest
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/blobpulse:latest
+          docker push ghcr.io/${{ github.repository_owner }}/blobpulse:${{ github.sha }}
 
-      - name: Push version tag
-        run: docker push ghcr.io/${{ steps.owner.outputs.owner }}/blobpulse:${{ github.sha }}
+      - name: Image Summary
+        run: |
+          echo "Published:"
+          echo "ghcr.io/${{ github.repository_owner }}/blobpulse:latest"
+          echo "ghcr.io/${{ github.repository_owner }}/blobpulse:${{ github.sha }}"
