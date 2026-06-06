@@ -1,6 +1,7 @@
 "use client";
 
 
+import API_URL from "@/lib/api";
 import { useEffect, useState } from "react";
 
 
@@ -19,20 +20,17 @@ type PricingModel = {
   storage: Record<string, StorageTier>;
 };
 
-
 export default function PricingSettings() {
-  const API = "http://localhost:8080/api/blob/ApproxPricing";
-
-
+  const API = `${API_URL}/api/blob/ApproxPricing`;
   const [data, setData] = useState<PricingModel>({
     region: "",
     currency: "",
     storage: {},
   });
 
+  console.log("API:", API);
 
   const [selectedTier, setSelectedTier] = useState("");
-
 
   // ================= LOAD =================
   useEffect(() => {
@@ -40,22 +38,14 @@ export default function PricingSettings() {
       try {
         const res = await fetch(API);
 
-
         if (!res.ok) {
           console.error("Failed to load pricing");
           return;
         }
 
-
         const result: PricingModel = await res.json();
-
-
         setData(result);
-
-
         const firstTier = Object.keys(result.storage)[0];
-
-
         if (firstTier) {
           setSelectedTier(firstTier);
         }
@@ -63,7 +53,6 @@ export default function PricingSettings() {
         console.error(err);
       }
     };
-
 
     fetchPricing();
   }, []);
@@ -118,7 +107,6 @@ export default function PricingSettings() {
   const selectedTierData = selectedTier
     ? data.storage[selectedTier]
     : undefined;
-
 
   return (
     <div className="bg-[#111] border border-white/10 rounded-xl p-6">

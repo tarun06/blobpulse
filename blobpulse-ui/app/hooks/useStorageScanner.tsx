@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { ScanReportResponse } from '../types/scanReportResponse';
+import API_URL from '@/lib/api';
 
 
 const EMPTY_REPORT: ScanReportResponse = {
@@ -41,7 +42,6 @@ const EMPTY_REPORT: ScanReportResponse = {
   ],
 };
 
-
 export function useStorageScanner() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export function useStorageScanner() {
     console.log("executeScan START", { connectionString, containerName });
 
     try {
-      const response = await fetch('http://localhost:8080/api/blob/Optimizer/scan', {
+      const response = await fetch(`${API_URL}/api/blob/Optimizer/scan`, {
         method: 'POST',
         headers: {
           'accept': 'text/plain',
