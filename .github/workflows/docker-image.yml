@@ -1,4 +1,4 @@
-name: Build and Push Blobpulse Image
+name: Build and Push with Docker Compose
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
     permissions:
@@ -14,29 +14,18 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout source
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to GitHub Container Registry
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
-        run: |
-          docker build . \
-            -t ghcr.io/${{ github.repository_owner }}/blobpulse:latest \
-            -t ghcr.io/${{ github.repository_owner }}/blobpulse:${{ github.sha }}
+      - name: Build images
+        run: docker compose build
 
-      - name: Push Docker image
-        run: |
-          docker push ghcr.io/${{ github.repository_owner }}/blobpulse:latest
-          docker push ghcr.io/${{ github.repository_owner }}/blobpulse:${{ github.sha }}
-
-      - name: Image Summary
-        run: |
-          echo "Published:"
-          echo "ghcr.io/${{ github.repository_owner }}/blobpulse:latest"
-          echo "ghcr.io/${{ github.repository_owner }}/blobpulse:${{ github.sha }}"
+      - name: Push images
+        run: docker compose push
