@@ -51,18 +51,15 @@ export function useStorageScanner() {
     setReport(EMPTY_REPORT);
   };
 
-
   const executeScan = async (connectionString: string, containerName: string) => {
     setLoading(true);
     setError(null);
-
-
-    // 🔥 CRITICAL: prevent stale UI flash
     resetReport();
 
+    console.log("executeScan START", { connectionString, containerName });
 
     try {
-      const response = await fetch('https://localhost:44316/api/blob/Optimizer/scan', {
+      const response = await fetch('http://localhost:8080/api/blob/Optimizer/scan', {
         method: 'POST',
         headers: {
           'accept': 'text/plain',
@@ -71,25 +68,34 @@ export function useStorageScanner() {
         body: JSON.stringify({ connectionString, containerName }),
       });
 
+      console.log("STATUS:", response.status);
+      const raw = await response.text();
+      let data: any;
+
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error("Invalid JSON response from server");
+      }
 
       if (!response.ok) {
-        throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        throw new Error(
+          data?.message ||
+          data?.details ||
+          `Server error ${response.status}`
+        );
       }
-      const data: ScanReportResponse = await response.json();
-      console.log("HOOK: response called", {
-        data
-      });
-      setTimeout(() => {
-        setReport(data);
-        setLoading(false);
-      }, 1500);
+
+      console.log("SCAN SUCCESS:", data);
+
+      setReport(data as ScanReportResponse);
     } catch (err: any) {
-      setError(err.message || 'An unexpected network error occurred.');
-      // Instantly kill loader on error so the UI doesn't hang forever
+      console.error("SCAN FAILED:", err);
+      setError(err.message || "Unexpected network error");
+    } finally {
       setLoading(false);
     }
   };
-
 
   return {
     executeScan,

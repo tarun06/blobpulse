@@ -12,6 +12,9 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
 
+    volumes:
+      - ~/.aspnet/https:/https:ro
+
     restart: unless-stopped
 
 
@@ -25,7 +28,7 @@ services:
       - "3000:3000"
 
     environment:
-      NEXT_PUBLIC_API_URL: http://api:8080
+      NEXT_PUBLIC_API_URL: http://api
 
     depends_on:
       - api

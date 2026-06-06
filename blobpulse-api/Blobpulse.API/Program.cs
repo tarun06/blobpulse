@@ -9,52 +9,64 @@ namespace Blobpulse.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
+            var corsPolicy = "CorsPolicy";
 
             builder.Services.AddControllers();
+            builder.Services.AddHealthChecks();
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddMemoryCache();
-            // Dependency Injection Enrollment
             builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
+
             builder.Configuration
                 .SetBasePath(builder.Environment.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-            builder.Services.Configure<AzureBlobPricingConfig>(builder.Configuration.GetSection("AzureBlobPricing"));
+            builder.Services.Configure<AzureBlobPricingConfig>(
+                builder.Configuration.GetSection("AzureBlobPricing"));
 
-            // Enable CORS so your standalone Next.js/React development server can hit these endpoints
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowFrontendApp", policy =>
+                options.AddPolicy(corsPolicy, policy =>
                 {
-                    policy
-                          .AllowAnyOrigin()
-                          .AllowAnyHeader()
-                          .AllowAnyMethod();
+                    policy.AllowAnyOrigin()
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
                 });
             });
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            // ---------------------------
+            // Swagger (CUSTOM ROUTE SAFE)
+            // ---------------------------
+
+            app.UseSwagger(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+                // IMPORTANT: keep default internal route
+                c.RouteTemplate = "api/blob/swagger/{documentName}/swagger.json";
+            });
+
+            app.UseSwaggerUI(c =>
+            {
+                c.RoutePrefix = "api/blob/swagger";
+
+                // IMPORTANT: MUST match internal swagger endpoint
+                c.SwaggerEndpoint("/api/blob/swagger/v1/swagger.json", "Blobpulse API v1");
+            });
 
             app.UseHttpsRedirection();
-            app.UseCors("AllowFrontendApp");
+
+            app.UseCors(corsPolicy);
+
             app.UseAuthorization();
 
-
             app.MapControllers();
+            app.MapHealthChecks("api/blob/health");
 
             app.Run();
         }
-
     }
 }

@@ -1,41 +1,38 @@
-# -------------------- BASE RUNTIME --------------------
+# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+
+# This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
+USER $APP_UID
 WORKDIR /app
 
-EXPOSE 80
-EXPOSE 8080
-EXPOSE 443
+# IMPORTANT: Azure requires container to listen on all interfaces
+ENV ASPNETCORE_URLS=http://+:8080
 
-# -------------------- BUILD STAGE --------------------
+EXPOSE 8080
+EXPOSE 8081
+
+
+# This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-# Copy solution first (for caching)
-COPY Blobpulse.slnx ./
+COPY ["Blobpulse.API/Blobpulse.API.csproj", "Blobpulse.API/"]
+COPY ["Blobpulse.Core/Blobpulse.Core.csproj", "Blobpulse.Core/"]
 
-# Copy project files (IMPORTANT for restore stability)
-COPY Blobpulse.API/Blobpulse.API.csproj Blobpulse.API/
-COPY Blobpulse.Core/Blobpulse.Core.csproj Blobpulse.Core/
-
-RUN ls -R /src
-
-# Restore
-RUN dotnet restore Blobpulse.slnx
-
-# Copy everything else
+RUN dotnet restore "./Blobpulse.API/Blobpulse.API.csproj"
 COPY . .
+WORKDIR "/src/Blobpulse.API"
+RUN dotnet build "./Blobpulse.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# Build
-RUN dotnet build Blobpulse.API/Blobpulse.API.csproj -c Release -o /app/build
-
-# -------------------- PUBLISH STAGE --------------------
+# This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
-RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "./Blobpulse.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# -------------------- FINAL RUNTIME --------------------
+# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
-
 COPY --from=publish /app/publish .
 
 ENTRYPOINT ["dotnet", "Blobpulse.API.dll"]

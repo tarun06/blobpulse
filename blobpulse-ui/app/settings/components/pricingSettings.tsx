@@ -21,7 +21,7 @@ type PricingModel = {
 
 
 export default function PricingSettings() {
-  const API = "https://localhost:44316/api/blob/ApproxPricing";
+  const API = "http://localhost:8080/api/blob/ApproxPricing";
 
 
   const [data, setData] = useState<PricingModel>({
