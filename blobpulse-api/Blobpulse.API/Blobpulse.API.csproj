@@ -14,4 +14,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Blobpulse.Core\Blobpulse.Core.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
