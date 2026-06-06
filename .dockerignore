@@ -1,0 +1,10 @@
+**/bin
+**/obj
+
+**/.next
+**/node_modules
+
+.vs
+.git
+
+README.md
