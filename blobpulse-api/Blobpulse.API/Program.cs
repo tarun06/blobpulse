@@ -43,19 +43,23 @@ namespace Blobpulse.API
             // Swagger (CUSTOM ROUTE SAFE)
             // ---------------------------
 
-            app.UseSwagger(c =>
+            // RESTRICT SWAGGER TO DEVELOPMENT ONLY
+            if (app.Environment.IsDevelopment())
             {
-                // IMPORTANT: keep default internal route
-                c.RouteTemplate = "api/blob/swagger/{documentName}/swagger.json";
-            });
+                app.UseSwagger(c =>
+                {
+                    // IMPORTANT: keep default internal route
+                    c.RouteTemplate = "api/blob/swagger/{documentName}/swagger.json";
+                });
 
-            app.UseSwaggerUI(c =>
-            {
-                c.RoutePrefix = "api/blob/swagger";
+                app.UseSwaggerUI(c =>
+                {
+                    c.RoutePrefix = "api/blob/swagger";
 
-                // IMPORTANT: MUST match internal swagger endpoint
-                c.SwaggerEndpoint("/api/blob/swagger/v1/swagger.json", "Blobpulse API v1");
-            });
+                    // IMPORTANT: MUST match internal swagger endpoint
+                    c.SwaggerEndpoint("/api/blob/swagger/v1/swagger.json", "Blobpulse API v1");
+                });
+            }
 
             app.UseHttpsRedirection();
 
