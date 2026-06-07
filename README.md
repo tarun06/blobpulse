@@ -49,8 +49,6 @@ Run the pre-configured start script from your terminal root directory:
 
 ```
 
-*(If lines are corrupted by Windows formatting, run `sed -i 's/\r$//' start.sh` first).*
-
 ### 2. Access Ports
 
 * **Minimalist Dashboard UI:** `http://localhost:3000`
