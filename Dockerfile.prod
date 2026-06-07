@@ -1,0 +1,86 @@
+############################################
+# 1. BUILD API
+############################################
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS api-build
+WORKDIR /src
+
+# Copy csproj files preserving folder structure for caching
+COPY blobpulse-api/Blobpulse.API/Blobpulse.API.csproj Blobpulse.API/
+COPY blobpulse-api/Blobpulse.Core/Blobpulse.Core.csproj Blobpulse.Core/
+
+RUN dotnet restore Blobpulse.API/Blobpulse.API.csproj
+
+# Copy the remaining API source files
+COPY blobpulse-api/ .
+
+RUN dotnet publish Blobpulse.API/Blobpulse.API.csproj \
+    -c Release \
+    -o /app/api \
+    /p:UseAppHost=false
+
+
+############################################
+# 2. BUILD UI (Next.js static export)
+############################################
+FROM node:20-alpine AS ui-build
+WORKDIR /ui
+
+# Install build essentials for native node modules if required
+RUN apk add --no-cache python3 make g++
+
+# Copy package management files first to maximize Docker layer caching
+COPY blobpulse-ui/package*.json ./
+RUN npm ci
+
+# Copy the remaining frontend code
+COPY blobpulse-ui/ .
+
+# Clear out any stale .next cache copied over from the Windows host
+RUN rm -rf .next
+
+RUN npm run build
+
+
+############################################
+# 3. FINAL RUNTIME (DYNAMIC CONFIG)
+############################################
+FROM mcr.microsoft.com/dotnet/aspnet:10.0
+WORKDIR /app
+
+# Install nginx, gettext (for envsubst), and tini
+RUN apt-get update && \
+    apt-get install -y nginx gettext tini && \
+    rm -rf /var/lib/apt/lists/*
+
+############################################
+# UI & API Artifacts Setup
+############################################
+# Copy .NET published binaries
+COPY --from=api-build /app/api ./
+
+# Copy Next.js static exported files
+COPY --from=ui-build /ui/out /var/www/html
+
+############################################
+# NGINX Configuration Template
+############################################
+# Source is 'default.conf', destination is 'default.conf.template'
+COPY nginx/default.conf /etc/nginx/templates/default.conf.template
+
+############################################
+# Environment Variables & Defaults
+############################################
+# Fallback defaults if no variables are passed at runtime
+ENV API_PORT=8080
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+
+# Ports exposed by the container
+EXPOSE 3000 8080
+
+############################################
+# Process Management & Startup Execution
+############################################
+ENTRYPOINT ["/usr/bin/tini", "--"]
+
+# Clean single binding entrypoint string
+CMD ["/bin/sh", "-c", "envsubst '${API_PORT}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;' & dotnet Blobpulse.API.dll"]
