@@ -337,6 +337,19 @@ docker run -d \
 --restart unless-stopped \
 --name blobpulse \
 ghcr.io/tarun06/blobpulse:latest
+
+or if the port is 8080, 
+
+docker rm -f blobpulse-prod-app
+
+docker run -d \
+  -p 3000:3000 \
+  -p 8080:8080 \
+  -e UI_PORT=3000 \
+  -e API_PORT=8080 \
+  -e ASPNETCORE_URLS="http://0.0.0.0:8080" \
+  --name blobpulse-prod-app \
+  ghcr.io/tarun06/blobpulse:latest
 ```
 
 ---
