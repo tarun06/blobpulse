@@ -19,6 +19,7 @@ namespace Blobpulse.API
 
             builder.Services.AddMemoryCache();
             builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
+            builder.Services.AddScoped<IExcelReportExporter, ExcelReportExporter>();
 
             builder.Configuration
                 .SetBasePath(builder.Environment.ContentRootPath)

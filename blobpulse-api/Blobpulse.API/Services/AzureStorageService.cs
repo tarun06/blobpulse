@@ -16,12 +16,15 @@ namespace Blobpulse.API.Services
     {
         private readonly IMemoryCache _cache;
         private readonly IOptionsMonitor<AzureBlobPricingConfig> _pricing;
+        private readonly IExcelReportExporter _excelReportExporter;
 
         public AzureStorageService(IMemoryCache cache,
+            IExcelReportExporter excelReportExporter,
             IOptionsMonitor<AzureBlobPricingConfig> pricing)
         {
             _cache = cache;
             _pricing = pricing;
+            _excelReportExporter = excelReportExporter;
         }
 
         private static string GetCacheKey(string connectionString, string containerName)
@@ -29,9 +32,9 @@ namespace Blobpulse.API.Services
             return $"scan:{containerName}:{connectionString.GetHashCode()}";
         }
 
-        public async Task<ScanReportResponse> AnalyzeContainerAsync(string connectionString, string containerName, bool includeGroupsInResponse, CancellationToken cancellationToken)
+        public async Task<ScanReportResponse> AnalyzeContainerAsync(string connectionString, string containerName, bool force, CancellationToken cancellationToken)
         {
-            var scanResult = await ScanAsync(connectionString, containerName, includeGroupsInResponse, cancellationToken);
+            var scanResult = await ScanAsync(connectionString, containerName, force, cancellationToken);
 
             // 4. PRECISION FINANCIAL CALCULATIONS
             const decimal ONE_GB = 1024m * 1024m * 1024m;
@@ -77,9 +80,7 @@ namespace Blobpulse.API.Services
                 ContainerBloatIndexPercentage = Math.Round(bloatIndex, 2),
                 OperationalImpactSummary = $"Purging duplicates can reduce total container size by {Math.Round(wastedGb, 2)} GB and decrease blob index pressure by {Math.Round(bloatIndex, 1)}%.",
 
-                DuplicateGroups = includeGroupsInResponse
-                    ? scanResult.DuplicateGroups!.OrderByDescending(g => g.WastedBytes).ToList()
-                    : []
+                DuplicateGroups = scanResult.DuplicateGroups!.OrderByDescending(g => g.WastedBytes).ToList() ?? []
             };
 
             return result;
@@ -88,12 +89,12 @@ namespace Blobpulse.API.Services
                 _pricing.CurrentValue.Storage.TryGetValue(tier, out var value) ? value : _pricing.CurrentValue.Storage["Hot"];
         }
 
-        private async Task<ScanMetrics> ScanAsync(string connectionString, string containerName, bool includeGroupsInResponse, CancellationToken cancellationToken)
+        private async Task<ScanMetrics> ScanAsync(string connectionString, string containerName, bool force, CancellationToken cancellationToken)
         {
             var cacheKey = GetCacheKey(connectionString, containerName);
 
             // 1. CACHE HIT
-            if (_cache.TryGetValue(cacheKey, out ScanMetrics? cachedMetrics) && cachedMetrics is not null)
+            if (!force && _cache.TryGetValue(cacheKey, out ScanMetrics? cachedMetrics) && cachedMetrics is not null)
             {
                 return cachedMetrics;
             }
@@ -155,7 +156,7 @@ namespace Blobpulse.API.Services
             long totalWastedBytes = 0;
             int totalRedundantCount = 0;
 
-            var duplicateGroups = includeGroupsInResponse ? new List<DuplicateGroupDto>() : null;
+            var duplicateGroups = new List<DuplicateGroupDto>();
 
             // Single-threaded reduction phase (Fast memory-bound operation)
             foreach (var kvp in tracker)
@@ -192,16 +193,13 @@ namespace Blobpulse.API.Services
                     }
                 }
 
-                if (includeGroupsInResponse)
+                duplicateGroups!.Add(new DuplicateGroupDto
                 {
-                    duplicateGroups!.Add(new DuplicateGroupDto
-                    {
-                        StructuralId = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(kvp.Key)),
-                        PrimaryInstance = files[0],
-                        RedundantInstances = files.Skip(1).ToList(),
-                        WastedBytes = groupWastedBytes // Populated for correct OrderBy execution
-                    });
-                }
+                    StructuralId = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(kvp.Key)),
+                    PrimaryInstance = files[0],
+                    RedundantInstances = files.Skip(1).ToList(),
+                    WastedBytes = groupWastedBytes // Populated for correct OrderBy execution
+                });
             }
 
             var scanMetrics = new ScanMetrics
@@ -214,9 +212,7 @@ namespace Blobpulse.API.Services
                 WastedColdBytes = wastedColdBytes,
                 WastedArchiveBytes = wastedArchiveBytes,
                 TotalWastedBytes = totalWastedBytes,
-                DuplicateGroups = includeGroupsInResponse
-                  ? duplicateGroups!.OrderByDescending(x => x.WastedBytes).ToList()
-                  : []
+                DuplicateGroups = duplicateGroups.OrderByDescending(x => x.WastedBytes).ToList()
             };
 
             // 6. DISTRIBUTE TO MEMORY CACHE
@@ -308,7 +304,7 @@ namespace Blobpulse.API.Services
 
         public async Task<AnalysisResult> AnalyzeAndExportReportToJsonAsync(string connectionString, string containerName, CancellationToken cancellationToken = default)
         {
-            var report = await AnalyzeContainerAsync(connectionString, containerName, true, cancellationToken);
+            var report = await AnalyzeContainerAsync(connectionString, containerName, false, cancellationToken);
             return new AnalysisResult
             {
                 Format = "json",
@@ -319,9 +315,15 @@ namespace Blobpulse.API.Services
 
         public async Task<AnalysisResult> AnalyzeAndExportReportCsvAsync(string connectionString, string containerName, CancellationToken cancellationToken = default)
         {
-            var report = await AnalyzeContainerAsync(connectionString, containerName, true, cancellationToken);
+            var report = await AnalyzeContainerAsync(connectionString, containerName, false, cancellationToken);
             return await ExportInCsvAsync(report);
         }
-    }
 
+        public async Task<byte[]> AnalyzeAndExportReportExcelAsync(string connectionString, string containerName, CancellationToken cancellationToken = default)
+        {
+            var report = await AnalyzeContainerAsync(connectionString, containerName, false, cancellationToken);
+            byte[] file = _excelReportExporter.Generate(report);
+            return file;
+        }
+    }
 }

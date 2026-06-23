@@ -17,5 +17,4 @@
             FileStream?.Dispose();
         }
     }
-
 }

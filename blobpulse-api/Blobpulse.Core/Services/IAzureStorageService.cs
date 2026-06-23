@@ -12,5 +12,6 @@ namespace Blobpulse.Core.Services
         Task<ScanReportResponse> AnalyzeContainerAsync(string connectionString, string containerName, bool includeGroupsInResponse = false, CancellationToken cancellationToken = default);
         Task<AnalysisResult> AnalyzeAndExportReportToJsonAsync(string connectionString, string containerName, CancellationToken cancellationToken = default);
         Task<AnalysisResult> AnalyzeAndExportReportCsvAsync(string connectionString, string containerName, CancellationToken cancellationToken = default);
+        Task<byte[]> AnalyzeAndExportReportExcelAsync(string connectionString, string containerName, CancellationToken cancellationToken = default);
     }
 }
