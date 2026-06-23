@@ -5,5 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	
+  <ItemGroup>
+	<PackageReference Include="Azure.Storage.Blobs" Version="12.28.0" />
+	<PackageReference Include="ClosedXML" Version="0.105.0" />
+  </ItemGroup>
 </Project>

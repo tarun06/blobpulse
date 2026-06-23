@@ -20,7 +20,7 @@ namespace Blobpulse.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ScanReportResponse))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> ScanContainer([FromBody] ScanRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> ScanContainer([FromBody] ScanRequest request, bool force = false, CancellationToken cancellationToken = default)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.ConnectionString) || string.IsNullOrWhiteSpace(request.ContainerName))
             {
@@ -29,7 +29,7 @@ namespace Blobpulse.API.Controllers
 
             try
             {
-                var report = await _storageService.AnalyzeContainerAsync(request.ConnectionString, request.ContainerName, true, cancellationToken);
+                var report = await _storageService.AnalyzeContainerAsync(request.ConnectionString, request.ContainerName, force, cancellationToken);
                 return Ok(report);
             }
             catch (Exception ex)
@@ -126,6 +126,57 @@ namespace Blobpulse.API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { message = "CSV export data streaming generation failure.", details = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Generates a Excel storage optimization report.
+        /// </summary>
+        [HttpPost("export/excel")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ExportAsExcel(
+            [FromBody] ScanRequest request,
+            CancellationToken cancellationToken)
+        {
+            if (IsInvalidRequest(request))
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid parameters. Connection string and container name are mandatory."
+                });
+            }
+
+            try
+            {
+                byte[] excelBytes =
+                    await _storageService.AnalyzeAndExportReportExcelAsync(
+                        request.ConnectionString,
+                        request.ContainerName,
+                        cancellationToken);
+
+
+                if (excelBytes == null || excelBytes.Length == 0)
+                {
+                    return StatusCode(500, new
+                    {
+                        message = "Excel report generation failed."
+                    });
+                }
+
+                return File(
+                    excelBytes,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    $"blobpulse-report-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    message = "Excel export generation failure.",
+                    details = ex.Message
+                });
             }
         }
 
