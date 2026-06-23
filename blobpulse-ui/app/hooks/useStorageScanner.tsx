@@ -1,10 +1,8 @@
 'use client';
 
-
 import { useState } from 'react';
 import { ScanReportResponse } from '../types/scanReportResponse';
 import API_URL from '@/lib/api';
-
 
 const EMPTY_REPORT: ScanReportResponse = {
   totalBlobsScanned: 0,
@@ -46,29 +44,36 @@ export function useStorageScanner() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [report, setReport] = useState<ScanReportResponse | null>(EMPTY_REPORT);
- 
+
   const resetReport = () => {
     setReport(EMPTY_REPORT);
   };
 
-  const executeScan = async (connectionString: string, containerName: string) => {
+  const executeScan = async (
+    connectionString: string,
+    containerName: string,
+    force: boolean = false
+  ) => {
     setLoading(true);
     setError(null);
     resetReport();
 
-    console.log("executeScan START", { connectionString, containerName });
-
     try {
-      const response = await fetch(`${API_URL}/api/blob/Optimizer/scan`, {
-        method: 'POST',
-        headers: {
-          'accept': 'text/plain',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ connectionString, containerName }),
-      });
+      const response = await fetch(
+        `${API_URL}/api/blob/Optimizer/scan?force=${force}`,
+        {
+          method: "POST",
+          headers: {
+            accept: "text/plain",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            connectionString,
+            containerName
+          })
+        }
+      );
 
-      console.log("STATUS:", response.status);
       const raw = await response.text();
       let data: any;
 
@@ -86,9 +91,8 @@ export function useStorageScanner() {
         );
       }
 
-      console.log("SCAN SUCCESS:", data);
-
       setReport(data as ScanReportResponse);
+
     } catch (err: any) {
       console.error("SCAN FAILED:", err);
       setError(err.message || "Unexpected network error");
@@ -97,8 +101,59 @@ export function useStorageScanner() {
     }
   };
 
+  const downloadExcelReport = async (
+    connectionString: string,
+    containerName: string
+  ) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/blob/Optimizer/export/excel`,
+        {
+          method: "POST",
+          headers: {
+            accept: "*/*",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            connectionString,
+            containerName
+          })
+        }
+      );
+
+      if (!response.ok) {
+        let errorMessage = `Export failed (${response.status})`;
+
+        try {
+          const error = await response.json();
+          errorMessage = error?.message || error?.details || errorMessage;
+        } catch {}
+
+        throw new Error(errorMessage);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `blobpulse-report-${new Date().toISOString().split("T")[0]}.xlsx`;
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+
+    } catch (err: any) {
+      console.error(err);
+      throw err;
+    }
+  };
+
   return {
     executeScan,
+    downloadExcelReport,
     report,
     loading,
     error,
