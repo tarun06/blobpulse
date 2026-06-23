@@ -156,7 +156,7 @@ namespace Blobpulse.API.Services
         }
 
         private void CreateCostAnalysis(
-            IXLWorksheet ws,
+            IXLWorksheet ws, 
             ScanReportResponse report)
         {
             int row = 11;
@@ -171,20 +171,20 @@ namespace Blobpulse.API.Services
             AddRow(
                 ws,
                 row++,
-                "Monthly Storage Waste",
-                $"${report.EstimatedMonthlyStorageWasteUsd:N2}");
+                "Yearly Storage Waste",
+                $"${(report.EstimatedMonthlyStorageWasteUsd * 12):N2}");
 
             AddRow(
                 ws,
                 row++,
-                "Monthly Operation Cost",
-                $"${report.EstimatedMonthlyOperationCostUsd:N2}");
+                "Yearly Operation Cost",
+                $"${(report.EstimatedMonthlyOperationCostUsd * 12):N2}");
 
             AddRow(
                 ws,
                 row++,
-                "Potential Savings",
-                $"${report.PotentialMonthlySavingsUsd:N2}");
+                "Potential Yearly Savings",
+                $"${(report.PotentialMonthlySavingsUsd * 12):N2}");
         }
 
         private void CreateContainerHealth(
