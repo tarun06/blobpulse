@@ -480,15 +480,8 @@ BlobPulse is ideal for:
 Planned features include:
 
 - Blob Cleanup Recommendations
-- Export Reports
 - Scheduled Scans
 - Historical Trends
-- Email Notifications
-- Azure AD Authentication
-- Multi-Storage Account Support
-- PDF Reports
-- CSV Export
-- REST API Enhancements
 
 ---
 
