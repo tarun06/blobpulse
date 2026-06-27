@@ -104,6 +104,12 @@ Features include:
 
 ---
 
+# Demo Video
+
+<video src="docs/BlobPulse.mp4" width="100%" controls></video>
+
+---
+
 # Screenshots
 
 ## Dashboard
