@@ -106,8 +106,7 @@ Features include:
 
 # Demo Video
 
-<video src="docs/BlobPulse.mp4" width="100%" controls></video>
-
+<video src="https://raw.githubusercontent.com/tarun06/blobpulse/main/docs/BlobPulse.mp4" width="100%" controls></video>
 ---
 
 # Screenshots
