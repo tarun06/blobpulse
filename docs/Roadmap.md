@@ -69,7 +69,7 @@ Move logs to Cool tier → Save $18/month
 
 ---
 
-# 🥉 v1.4 – Reporting & Automation
+# 🥉 v1.3 – Reporting & Automation
 
 - PDF reports
 - Scheduled scans

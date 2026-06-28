@@ -390,14 +390,24 @@ BlobPulse is evolving into a **Storage Optimization Decision Engine**.
 
 ---
 
+## 🥈 v1.2 – Storage Insights
+
+- Scan history tracking
+- Blob search
+- Largest blobs view
+- Storage breakdown analytics
+- Growth trends
+
+---
+
 ## 🥇 v1.3 – Optimization Advisor (TOP PRIORITY)
 
 - Smart duplicate deletion recommendations
-- Storage tier optimization
-- Cold data detection
-- Savings estimation per action
-- Confidence scoring
-- Risk classification
+- Storage tier optimization (Hot → Cool → Archive)
+- Cold data detection (inactive blobs)
+- Savings estimation per action ($ impact)
+- Confidence scoring engine
+- Risk classification (Low / Medium / High
 
 ---
 
