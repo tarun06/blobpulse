@@ -28,33 +28,31 @@ Analyze Azure Blob Storage at scale, identify duplicate blobs, estimate storage 
 
 ---
 
-# Overview
+# 🚀 Overview
 
 BlobPulse is an enterprise-grade Azure Blob Storage analytics platform designed to help organizations discover redundant storage, identify duplicate files, estimate financial waste, and optimize cloud storage costs without modifying production data.
 
-Unlike traditional storage explorers, BlobPulse focuses on actionable insights rather than file browsing.
+Unlike traditional storage explorers, BlobPulse focuses on **actionable insights rather than file browsing**.
 
 The application performs metadata analysis only and operates in **read-only mode**, making it safe for production environments.
 
 ---
 
-# Features
+# ✨ Features
 
-## Duplicate Detection
+## 🔍 Duplicate Detection
 
-Detect identical blobs across one or multiple containers using metadata comparison.
+Detect identical blobs across one or more containers using metadata comparison.
 
-✔ Duplicate Groups
-
-✔ Redundant Blob Discovery
-
-✔ Hash-based Identification
-
-✔ Storage Reclamation Estimates
+✔ Duplicate Groups  
+✔ Redundant Blob Discovery  
+✔ Hash-based Identification  
+✔ Primary vs Redundant classification  
+✔ Storage Reclamation Estimates  
 
 ---
 
-## Storage Analytics
+## 📊 Storage Analytics
 
 Understand storage utilization through an interactive dashboard.
 
@@ -64,10 +62,11 @@ Understand storage utilization through an interactive dashboard.
 - Storage Consumption
 - Waste Distribution
 - Monthly Cost Estimation
+- Storage Tier Breakdown
 
 ---
 
-## Cost Optimization
+## 💰 Cost Optimization
 
 Convert duplicate storage into financial metrics.
 
@@ -78,40 +77,69 @@ Convert duplicate storage into financial metrics.
 
 ---
 
-## Enterprise Security
+## 📥 Reporting & Export (NEW)
+
+- 📥 Excel Report Export (.xlsx)
+- 📊 Full scan summary export
+- 📦 Duplicate group breakdown
+- 💰 Cost savings breakdown
+- 🧾 Offline analysis support
+
+---
+
+## 🔄 Scan Control (NEW)
+
+- 🔄 Force Scan (bypass cache for fresh analysis)
+- ⚡ Cached scan for performance optimization
+- 🧠 Improved scan execution workflow
+
+---
+
+## 🧠 Optimization Engine (UPCOMING – CORE FEATURE)
+
+- Smart duplicate deletion recommendations
+- Storage tier optimization (Hot → Cool → Archive)
+- Cold data detection (inactive blobs)
+- Savings estimation per action
+- Confidence scoring engine
+- Risk classification (Low / Medium / High)
+
+---
+
+## 🏢 Enterprise Security
 
 BlobPulse never modifies Azure Storage.
 
-Features include:
-
-- Read-only SAS Authentication
-- Metadata-only Analysis
-- Zero File Uploads
-- Zero Blob Modification
-- Private Network Deployment
-- On-Premises Support
-
----
-
-## Modern Dashboard
-
-- Dark Theme
-- High-density Layout
-- Interactive Charts
-- Duplicate Browser
-- Pricing Calculator
-- Real-time Statistics
+- Read-only SAS authentication
+- Metadata-only analysis
+- Zero file downloads
+- Zero blob modifications
+- Private network deployment
+- On-premises support
+- Air-gapped deployment ready
 
 ---
 
-# Demo Video
+## 🎨 Modern Dashboard
 
+- Dark theme UI
+- High-density analytics layout
+- Interactive charts
+- Duplicate browser
+- Pricing calculator
+- Real-time metrics
+
+---
+
+# 📥 Demo Video
+
+```
 https://raw.githubusercontent.com/tarun06/blobpulse/main/docs/BlobPulse.mp4
+```
 
-<video src="https://raw.githubusercontent.com/tarun06/blobpulse/main/docs/BlobPulse.mp4" width="100%" controls></video>
 ---
 
-# Screenshots
+# 📸 Screenshots
 
 ## Dashboard
 
@@ -137,38 +165,30 @@ https://raw.githubusercontent.com/tarun06/blobpulse/main/docs/BlobPulse.mp4
 
 ---
 
-# Architecture
+# 🏗 Architecture
 
 ```
-                    Azure Blob Storage
-
-                           │
-                           │
-                 Read-Only SAS Access
-                           │
-                           ▼
-
-                  .NET 10 Metadata Engine
-
-                           │
-                           ▼
-
-               Duplicate Detection Engine
-
-                           │
-                           ▼
-
-                 Cost Analysis Service
-
-                           │
-                           ▼
-
-                  Next.js Dashboard UI
+Azure Blob Storage
+        │
+        ▼
+Read-Only SAS Access
+        │
+        ▼
+.NET 10 Metadata Engine
+        │
+        ▼
+Parallel Duplicate Detection Engine
+        │
+        ▼
+Cost Analysis Service
+        │
+        ▼
+Next.js Dashboard UI
 ```
 
 ---
 
-# Technology Stack
+# ⚙️ Technology Stack
 
 | Component | Technology |
 |------------|------------|
@@ -178,114 +198,81 @@ https://raw.githubusercontent.com/tarun06/blobpulse/main/docs/BlobPulse.mp4
 | Styling | Tailwind CSS |
 | Charts | Recharts |
 | Storage SDK | Azure Storage SDK |
-| Authentication | Azure SAS |
+| Authentication | SAS Tokens |
 | Deployment | Docker |
-| Container | Linux |
+| Runtime | Linux Containers |
 
 ---
 
-# Dashboard Metrics
+# 📊 Dashboard Metrics
 
-BlobPulse provides actionable storage intelligence including:
+BlobPulse provides actionable storage intelligence:
 
 - Total Blobs Scanned
 - Duplicate Groups
 - Redundant Files
-- Wasted Storage
-- Monthly Storage Waste
-- Recoverable Savings
+- Wasted Storage (GB)
+- Monthly Storage Waste ($)
+- Recoverable Savings ($)
 - Container Bloat Index
+- Storage Tier Distribution
 - Duplicate Preview
 - Redundant Instances
+- Scan Mode (Cached / Force Scan)
 
 ---
 
-# Pricing Engine
+# 💰 Pricing Engine
 
-BlobPulse includes a configurable Azure pricing engine.
-
-Configure:
-
-- Azure Region
-- Currency
-- Storage Tier
+- Azure region-based pricing
+- Storage tier cost modeling
+- Operation cost estimation
+- Monthly & yearly projections
 
 Supports:
-
 - Hot
 - Cool
 - Cold
 - Archive
 
-Pricing configuration includes:
-
-- Storage Cost
-- Read Operations
-- Write Operations
-- List Operations
-- Retrieval Charges
-
 ---
 
-# Security
-
-BlobPulse was designed with enterprise security in mind.
+# 🔐 Security
 
 ## Read-only Access
 
-The application requires only:
+- List permissions
+- Read permissions only
 
-- List
-- Read
-
-permissions.
-
-Delete and Write permissions are never required.
-
----
-
-## Metadata Analysis Only
-
-BlobPulse never downloads file contents.
-
-Only metadata is processed:
+## Metadata Only Processing
 
 - Blob Name
 - Size
 - ETag
 - Last Modified
-- Hash
 - Content Type
 
----
+## Deployment Safety
 
-## Private Deployment
-
-BlobPulse can run completely inside your network.
-
-Supported environments:
-
-- Azure Virtual Machines
-- Kubernetes
-- Docker
-- Private VNet
-- Air-gapped Networks
+- No writes
+- No deletions
+- No uploads
+- No external API calls
 
 ---
 
-# Local Development
+# ⚙️ Local Development
 
 ## Clone Repository
 
 ```bash
 git clone https://github.com/tarun06/blobpulse.git
-
 cd blobpulse
 ```
 
 ---
 
-## Start Application
+## Run Locally
 
 ```bash
 ./start.sh
@@ -295,35 +282,26 @@ cd blobpulse
 
 ## Access
 
-Dashboard
-
-```
-http://localhost:3000
-```
-
-Swagger
-
-```
-http://localhost:8000/api/blob/swagger
-```
+- Dashboard: http://localhost:3000
+- API Swagger: http://localhost:8000/api/blob/swagger
 
 ---
 
-# Docker
+# 🐳 Docker
 
-Build
+## Build
 
 ```bash
 docker compose build
 ```
 
-Start
+## Run
 
 ```bash
 docker compose up -d
 ```
 
-Stop
+## Stop
 
 ```bash
 docker compose down
@@ -331,24 +309,9 @@ docker compose down
 
 ---
 
-# Production Deployment
-
-Run the production image.
+# 🚀 Production Deployment
 
 ```bash
-docker run -d \
--p 3000:3000 \
--p 8000:8000 \
--e API_PORT=8000 \
--e ASPNETCORE_URLS="http://0.0.0.0:8000" \
---restart unless-stopped \
---name blobpulse \
-ghcr.io/tarun06/blobpulse:latest
-
-or if the port is 8080, 
-
-docker rm -f blobpulse-prod-app
-
 docker run -d \
   -p 3000:3000 \
   -p 8080:8080 \
@@ -361,154 +324,134 @@ docker run -d \
 
 ---
 
-# Air-Gapped Deployment
+# 🌐 Air-Gapped Deployment
 
-Export
+## Export Image
 
 ```bash
-docker save \
--o blobpulse.tar \
-ghcr.io/tarun06/blobpulse:latest
+docker save -o blobpulse.tar ghcr.io/tarun06/blobpulse:latest
 ```
 
-Import
+## Import Image
 
 ```bash
-docker load \
--i blobpulse.tar
+docker load -i blobpulse.tar
 ```
 
-Run
+## Run
 
 ```bash
-sudo docker run -d \
+ docker run -d \
   -p 3000:3000 \
-  -p 8000:8000 \
-  -e API_PORT=8000 \
-  -e ASPNETCORE_URLS="http://0.0.0.0:8000" \
-  --restart unless-stopped \
-  --name blobpulse-app \
+  -p 8080:8080 \
+  -e UI_PORT=3000 \
+  -e API_PORT=8080 \
+  -e ASPNETCORE_URLS="http://0.0.0.0:8080" \
+  --name blobpulse-prod-app \
   ghcr.io/tarun06/blobpulse:latest
 ```
 
 ---
 
-# Typical Workflow
+# 🔄 Typical Workflow
 
 ```
 Connect to Azure Storage
-
-        │
-
-        ▼
-
+        ↓
 Scan Containers
-
-        │
-
-        ▼
-
+        ↓
 Index Metadata
-
-        │
-
-        ▼
-
+        ↓
 Detect Duplicates
-
-        │
-
-        ▼
-
+        ↓
 Calculate Savings
-
-        │
-
-        ▼
-
+        ↓
 Review Dashboard
-
-        │
-
-        ▼
-
+        ↓
 Optimize Storage
 ```
 
 ---
 
-# Use Cases
-
-BlobPulse is ideal for:
+# 📦 Use Cases
 
 - Enterprise IT
 - Cloud Architects
-- Azure Administrators
 - DevOps Teams
-- Platform Engineers
-- FinOps Teams
+- FinOps Engineers
+- Storage Administrators
 - Managed Service Providers
 
 ---
 
-# Why BlobPulse?
+# 🧭 Roadmap
 
-✔ Detect duplicate blobs
-
-✔ Estimate cloud waste
-
-✔ Improve storage efficiency
-
-✔ Reduce Azure costs
-
-✔ Enterprise ready
-
-✔ Secure by design
-
-✔ Metadata-only analysis
-
-✔ Read-only architecture
-
-✔ Docker deployment
-
-✔ Modern dashboard
+BlobPulse is evolving into a **Storage Optimization Decision Engine**.
 
 ---
 
-# Roadmap
+## 🥇 v1.3 – Optimization Advisor (TOP PRIORITY)
 
-Planned features include:
-
-- Blob Cleanup Recommendations
-- Scheduled Scans
-- Historical Trends
-
----
-
-# License
-
-Licensed under the MIT License.
-
-See the LICENSE file for details.
+- Smart duplicate deletion recommendations
+- Storage tier optimization
+- Cold data detection
+- Savings estimation per action
+- Confidence scoring
+- Risk classification
 
 ---
 
-# Author
+## 🥈 v1.2 – Storage Insights
+
+- Scan history tracking
+- Blob search
+- Largest blobs view
+- Storage breakdown analytics
+- Growth trends
+
+---
+
+## 🥉 v1.4 – Automation & Reporting
+
+- PDF reports
+- Scheduled scans
+- Scheduled reports
+- Azure CLI export scripts
+- PowerShell automation
+
+---
+
+## 🔵 v2.0 – Enterprise Mode
+
+- Multi-storage configurations
+- API enhancements
+- Rule-based scan engine
+- Audit logging system
+
+---
+
+# 💡 Why BlobPulse?
+
+✔ Detect duplicate blobs  
+✔ Estimate storage waste  
+✔ Reduce cloud cost  
+✔ Improve efficiency  
+✔ Run fully on-prem  
+✔ No data modification risk  
+
+---
+
+# 📜 License
+
+MIT License
+
+---
+
+# 👤 Author
 
 **Tarun Kalal**
 
-Software Architect
+Software Architect  
+Cloud • .NET • Distributed Systems • FinOps Optimization
 
-Azure • .NET • Distributed Systems • Cloud Optimization • AI Solutions
-
-GitHub
-
-https://github.com/tarun06
-
----
-
-# Support
-
-If you find this project useful, consider giving it a ⭐ on GitHub.
-
-Contributions, suggestions, and pull requests are always welcome.
+GitHub: https://github.com/tarun06
